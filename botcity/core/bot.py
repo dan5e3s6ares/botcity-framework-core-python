@@ -141,11 +141,10 @@ class DesktopBot(BaseBot):
         Returns:
             Image: The Image object
         """
-        path = self.state.map_images.get(label)
-        if not path:
+        if path := self.state.map_images.get(label):
+            return Image.open(path)
+        else:
             raise KeyError('Invalid label for image map.')
-        img = Image.open(path)
-        return img
 
     def find_multiple(self, labels, x=None, y=None, width=None, height=None, *,
                       threshold=None, matching=0.9, waiting_time=10000, best=True, grayscale=False):
@@ -175,7 +174,7 @@ class DesktopBot(BaseBot):
         """
 
         def _to_dict(lbs, elems):
-            return {k: v for k, v in zip(lbs, elems)}
+            return dict(zip(lbs, elems))
 
         screen_w, screen_h = self._fix_display_size()
         x = x or 0
@@ -230,15 +229,16 @@ class DesktopBot(BaseBot):
     def _fix_display_size(self):
         width, height = ImageGrab.grab().size
 
-        if not is_retina():
-            return width, height
-
-        return int(width*2), int(height*2)
+        return (int(width*2), int(height*2)) if is_retina() else (width, height)
 
     def _find_multiple_helper(self, haystack, region, confidence, grayscale, needle):
-        ele = cv2find.locate_all_opencv(needle, haystack, region=region,
-                                        confidence=confidence, grayscale=grayscale)
-        return ele
+        return cv2find.locate_all_opencv(
+            needle,
+            haystack,
+            region=region,
+            confidence=confidence,
+            grayscale=grayscale,
+        )
 
     def find(self, label, x=None, y=None, width=None, height=None, *, threshold=None,
              matching=0.9, waiting_time=10000, best=True, grayscale=False):
@@ -550,8 +550,7 @@ class DesktopBot(BaseBot):
         y = y or 0
         width = width or screen_w
         height = height or screen_h
-        img = self.screenshot(region=(x, y, width, height))
-        return img
+        return self.screenshot(region=(x, y, width, height))
 
     def save_screenshot(self, path):
         """
@@ -649,8 +648,7 @@ class DesktopBot(BaseBot):
         Returns:
             bool: Whether or not the request was successful
         """
-        status = webbrowser.open(url, location)
-        return status
+        return webbrowser.open(url, location)
 
     #######
     # Mouse
@@ -974,7 +972,7 @@ class DesktopBot(BaseBot):
 
         """
         delay = max(0, wait or config.DEFAULT_SLEEP_AFTER_ACTION)
-        for i in range(presses):
+        for _ in range(presses):
             self._kb_controller.tap(Key.tab)
             self.sleep(delay)
 
@@ -988,7 +986,7 @@ class DesktopBot(BaseBot):
 
         """
         delay = max(0, wait or config.DEFAULT_SLEEP_AFTER_ACTION)
-        for i in range(presses):
+        for _ in range(presses):
             self._kb_controller.tap(Key.enter)
             self.sleep(delay)
 
@@ -1141,8 +1139,7 @@ class DesktopBot(BaseBot):
                 formatted_keys.append(key)
                 continue
             key = key.lower()
-            key_value = keys_map.get(key, None)
-            if key_value:
+            if key_value := keys_map.get(key, None):
                 formatted_keys.append(key_value)
             elif key in Key._member_names_:
                 key_value = Key[key]
@@ -1642,8 +1639,7 @@ class DesktopBot(BaseBot):
         Returns
             dialog (WindowSpecification): The window or control found.
         """
-        dialog = find_window(self.app, waiting_time, **selectors)
-        return dialog
+        return find_window(self.app, waiting_time, **selectors)
 
     @if_app_connected
     def find_app_element(self, from_parent_window: 'WindowSpecification' = None,
@@ -1663,5 +1659,4 @@ class DesktopBot(BaseBot):
         Returns
             element (WindowSpecification): The element/control found.
         """
-        element = find_element(self.app, from_parent_window, waiting_time, **selectors)
-        return element
+        return find_element(self.app, from_parent_window, waiting_time, **selectors)

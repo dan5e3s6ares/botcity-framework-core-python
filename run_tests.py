@@ -11,6 +11,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         args.extend(sys.argv[1:])
 
-    print('pytest arguments: {}'.format(args))
+    print(f'pytest arguments: {args}')
 
     sys.exit(pytest.main(args))
