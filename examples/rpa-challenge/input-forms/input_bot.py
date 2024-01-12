@@ -40,9 +40,8 @@ class Bot(DesktopBot):
 
         USE_FIND_MULTIPLE = True
 
-        if USE_FIND_MULTIPLE:
-            # Using Find Parallel
-            for index, row in df.iterrows():
+        for index, row in df.iterrows():
+            if USE_FIND_MULTIPLE:
                 results = self.find_multiple(labels, matching=0.8)
                 for idx, (label, ele) in enumerate(results.items()):
                     if ele is None:
@@ -54,9 +53,7 @@ class Bot(DesktopBot):
                         self.click_at(x + 10, y + 30)
                         self.copy_to_clipboard(str(row[df.columns[idx]]))
                         self.paste()
-        else:
-            # Using Find Serial Mode
-            for index, row in df.iterrows():
+            else:
                 for col in df.columns:
                     entry_value = row[col]
                     self.find_text(col.strip(), matching=0.8)

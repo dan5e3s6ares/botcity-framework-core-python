@@ -32,8 +32,7 @@ def connect(backend=Backend.WIN_32, timeout=60000, **connection_selectors) -> Ap
                 raise connect_exception
             return None
         try:
-            app = Application(backend=backend).connect(**connection_selectors)
-            return app
+            return Application(backend=backend).connect(**connection_selectors)
         except Exception as e:
             connect_exception = e
             time.sleep(config.DEFAULT_SLEEP_AFTER_ACTION/1000.0)

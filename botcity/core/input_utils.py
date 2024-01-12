@@ -81,6 +81,6 @@ def _mouse_click(mouse_controller: Controller, x: int, y: int, clicks=1, interva
 
         mouse_controller.position = (x, y)
         time.sleep(0.1)
-        for i in range(clicks):
+        for _ in range(clicks):
             mouse_controller.click(button=mouse_button, count=1)
             time.sleep(interval_between_clicks / 1000.0)
